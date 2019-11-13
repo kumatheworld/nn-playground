@@ -67,36 +67,54 @@ class HandmadeFC():
         self.forward(x)
         self.loss_test = self.loss(self.a2, y)
 
-    def main(self):
-        batch_size = 128
-        lr = 1e-2
 
-        train_loader = torch.utils.data.DataLoader(
-        datasets.MNIST('data', train=True, download=True,
-                       transform=transforms.Compose([
-                           transforms.ToTensor(),
-                           transforms.Normalize((0.1307,), (0.3081,))
-                       ])),
-        batch_size=batch_size, shuffle=True)
-        test_loader = torch.utils.data.DataLoader(
-        datasets.MNIST('data', train=False, transform=transforms.Compose([
-                           transforms.ToTensor(),
-                           transforms.Normalize((0.1307,), (0.3081,))
-                       ])),
-        batch_size=batch_size, shuffle=True)
+def main():
+    net = HandmadeFC()
+    batch_size = 128
+    lr = 1e-2
+    epochs = 10
+    log_interval = 10
 
-        for x, y in train_loader:
+    train_loader = torch.utils.data.DataLoader(
+    datasets.MNIST('data', train=True, download=True,
+                   transform=transforms.Compose([
+                       transforms.ToTensor(),
+                       transforms.Normalize((0.1307,), (0.3081,))
+                   ])),
+    batch_size=batch_size, shuffle=True)
+    test_loader = torch.utils.data.DataLoader(
+    datasets.MNIST('data', train=False, transform=transforms.Compose([
+                       transforms.ToTensor(),
+                       transforms.Normalize((0.1307,), (0.3081,))
+                   ])),
+    batch_size=batch_size, shuffle=True)
+
+    for epoch in range(1, epochs + 1):
+        # train
+        for batch_idx, (x, y) in enumerate(train_loader):
             x = x.numpy()
             y = y.numpy()
-            self.train(x, y, lr)
-            print(self.loss_train)
+            net.train(x, y, lr)
+            if batch_idx % log_interval == 0:
+                print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
+                    epoch, batch_idx * len(x), len(train_loader.dataset),
+                    100. * batch_idx / len(train_loader), net.loss_train))
 
+        # test
+        test_loss = 0
+        correct = 0
+        for x, y in test_loader:
+            x = x.numpy()
+            y = y.numpy()
+            net.test(x, y)
+            pred = net.a2.argmax(axis=1)
+            test_loss += net.loss_test * batch_size
+            correct += sum(pred == y)
+
+        test_loss /= len(test_loader.dataset)
+        print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
+            test_loss, correct, len(test_loader.dataset),
+            100. * correct / len(test_loader.dataset)))
 
 if __name__ == '__main__':
-    net = HandmadeFC()
-    x = np.random.randn(3, 1, 28, 28)
-    y = np.array([3, 8, 2])
-    lr = 1e-5
-    net.train(x, y, lr)
-
-    net.main()
+    main()
