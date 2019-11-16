@@ -9,7 +9,7 @@ size_in = 28 * 28
 size_out = 10
 
 
-class KumaFC(nn.Module):
+class FC(nn.Module):
     def __init__(self):
         super().__init__()
         self.size_hidden = 100
@@ -22,7 +22,7 @@ class KumaFC(nn.Module):
         x = self.fc2(x)
         return F.log_softmax(x, dim=1)
 
-class KumaFCSeq(nn.Module):
+class FCSeq(nn.Module):
     def __init__(self):
         super().__init__()
         self.size_hidden = 100
@@ -39,9 +39,9 @@ class KumaFCSeq(nn.Module):
         return x
 
 
-class KumaCNN(nn.Module):
+class CNN(nn.Module):
     def __init__(self):
-        super(KumaCNN, self).__init__()
+        super(CNN, self).__init__()
         self.conv1 = nn.Conv2d(1, 20, 5, 1)
         self.conv2 = nn.Conv2d(20, 50, 5, 1)
         self.fc1 = nn.Linear(4*4*50, 500)
@@ -57,9 +57,9 @@ class KumaCNN(nn.Module):
         x = self.fc2(x)
         return F.log_softmax(x, dim=1)
 
-class KumaCNNSeq(nn.Module):
+class CNNSeq(nn.Module):
     def __init__(self):
-        super(KumaCNNSeq, self).__init__()
+        super(CNNSeq, self).__init__()
         self.features = nn.Sequential(
             nn.Conv2d(1, 20, 5, 1),
             nn.ReLU(inplace=True),
@@ -172,4 +172,4 @@ def main(net):
 
 
 if __name__ == '__main__':
-    main(KumaFC)
+    main(FC)
