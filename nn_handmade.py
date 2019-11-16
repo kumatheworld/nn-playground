@@ -65,12 +65,12 @@ class MyNN():
 class MyFC(MyNN):
     def __init__(self):
         super().__init__()
-        self.size_hidden = 100
 
-        self.add_linear('w1', (self.size_in, self.size_hidden))
-        self.add_linear('b1', self.size_hidden)
-        self.add_linear('w2', (self.size_hidden, self.size_out))
-        self.add_linear('b2', (self.size_out))
+        size_hidden = 100
+        self.add_linear('w1', (self.size_in, size_hidden))
+        self.add_linear('b1', size_hidden)
+        self.add_linear('w2', (size_hidden, self.size_out))
+        self.add_linear('b2', self.size_out)
 
     def forward(self, x):
         self.x = x.reshape(-1, self.size_in)
