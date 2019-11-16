@@ -4,13 +4,13 @@ from scipy.special import logsumexp, softmax
 from torchvision import datasets, transforms
 import torch
 
-class HandmadeTensor():
+class MyTensor():
     def __init__(self, val):
         self.val = val
         self.grad = 0
         self.velocity = 0
 
-class HandmadeNN():
+class MyNN():
     def __init__(self):
         self.size_in = 28 * 28
         self.size_out = 10
@@ -25,7 +25,7 @@ class HandmadeNN():
         return np.random.uniform(-bd, bd, size)
 
     def add_linear(self, name, size):
-        self.params[name] = HandmadeTensor(self.xavier_init_linear(size))
+        self.params[name] = MyTensor(self.xavier_init_linear(size))
 
     def forward(self, x):
         pass
@@ -62,7 +62,7 @@ class HandmadeNN():
         self.loss_test = self.loss(out, y)
 
 
-class HandmadeFC(HandmadeNN):
+class MyFC(MyNN):
     def __init__(self):
         super().__init__()
         self.size_hidden = 100
@@ -101,7 +101,7 @@ class HandmadeFC(HandmadeNN):
 
 
 def main():
-    net = HandmadeFC()
+    net = MyFC()
     batch_size = 128
     lr = 1e-2
     rho = 0.9
