@@ -16,16 +16,16 @@ class MyNN():
         self.size_out = 10
         self.params = {}
 
-    def xavier_init_linear(self, size):
-        if isinstance(size, (tuple, list)):
-            size_in = size[0]
-        else:
-            size_in = size
+    def xavier_init(self, size_in, size):
         bd = 1 / math.sqrt(self.size_in)
         return np.random.uniform(-bd, bd, size)
 
+    def add(self, name, size_in, size):
+        self.params[name] = MyTensor(self.xavier_init(size_in, size))
+
     def add_linear(self, name, size):
-        self.params[name] = MyTensor(self.xavier_init_linear(size))
+        self.add('w' + name, size[0], size)
+        self.add('b' + name, size[0], size[1])
 
     def forward(self, x):
         pass
@@ -67,10 +67,8 @@ class MyFC(MyNN):
         super().__init__()
 
         size_hidden = 100
-        self.add_linear('w1', (self.size_in, size_hidden))
-        self.add_linear('b1', size_hidden)
-        self.add_linear('w2', (size_hidden, self.size_out))
-        self.add_linear('b2', self.size_out)
+        self.add_linear('1', (self.size_in, size_hidden))
+        self.add_linear('2', (size_hidden, self.size_out))
 
     def forward(self, x):
         self.x = x.reshape(-1, self.size_in)
