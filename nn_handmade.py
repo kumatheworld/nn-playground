@@ -27,6 +27,9 @@ class MyNN():
         self.add('w' + name, size[0], size)
         self.add('b' + name, size[0], size[1])
 
+    def fw_linear(self, x, w, b):
+        return x.dot(w) + b
+
     def forward(self, x):
         pass
 
@@ -72,9 +75,9 @@ class MyFC(MyNN):
 
     def forward(self, x):
         self.x = x.reshape(-1, self.size_in)
-        self.z1 = self.x.dot(self.params['w1'].val) + self.params['b1'].val
+        self.z1 = self.fw_linear(self.x, self.params['w1'].val, self.params['b1'].val)
         self.a1 = np.maximum(self.z1, 0)
-        self.z2 = self.a1.dot(self.params['w2'].val) + self.params['b2'].val
+        self.z2 = self.fw_linear(self.a1, self.params['w2'].val, self.params['b2'].val)
         self.a2 = self.z2 - logsumexp(self.z2, axis=1).reshape(-1, 1)
         return self.a2
 
