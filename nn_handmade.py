@@ -31,6 +31,10 @@ class MyNN():
     def fw_linear(self, x, w, b):
         return x.dot(w) + b
 
+    def add_conv2d(self, name, size):
+        self.add('cw' + name, size[1], size)
+        self.add('cb' + name, size[1], size[0])
+
     def forward(self, x):
         pass
 
