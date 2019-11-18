@@ -43,6 +43,17 @@ class MyNN():
         y += b_rep
         return y
 
+    def fw_maxpool2d(self, x, k):
+        kh = k[0]
+        kw = k[1]
+        h_out = x.shape[2] // kh
+        w_out = x.shape[3] // kw
+        y = [np.max(x[:, :, i*kh:(i+1)*kh, :], axis=2) for i in range(h_out)]
+        y = np.stack(y, axis=2)
+        y = [np.max(y[:, :, :, j*kw:(j+1)*kw], axis=3) for j in range(w_out)]
+        y = np.stack(y, axis=3)
+        return y
+
     def forward(self, x):
         pass
 
