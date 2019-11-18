@@ -12,7 +12,8 @@ class MyTensor():
 
 class MyNN():
     def __init__(self):
-        self.size_in = 28 * 28
+        self.size_in_side = 28
+        self.size_in = self.size_in_side * self.size_in_side
         self.size_out = 10
         self.params = {}
 
