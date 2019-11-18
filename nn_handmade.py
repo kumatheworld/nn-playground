@@ -1,6 +1,7 @@
 import numpy as np
 import math
 from scipy.special import logsumexp, softmax
+from scipy.signal import correlate
 from torchvision import datasets, transforms
 import torch
 
@@ -34,6 +35,13 @@ class MyNN():
     def add_conv2d(self, name, size):
         self.add('cw' + name, size[1], size)
         self.add('cb' + name, size[1], size[0])
+
+    def fw_conv2d(self, x, w, b):
+        sheet = [correlate(x, np.expand_dims(w[i], axis=0), 'valid') for i in range(w.shape[0])]
+        y = np.concatenate(sheet, axis=1)
+        b_rep = np.expand_dims(np.expand_dims(np.tile(b, (y.shape[0], 1)), -1), -1)
+        y += b_rep
+        return y
 
     def forward(self, x):
         pass
