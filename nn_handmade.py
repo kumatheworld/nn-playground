@@ -41,6 +41,16 @@ class MyNN():
         self.params[f'w{i}'].grad = np.transpose(x).dot(grad_y)
         pass
 
+    def bw_nll_loss(self, z, y):
+        n = y.shape[0]
+
+        grad_a = np.zeros((n, self.size_out))
+        for i in range(n):
+            grad_a[i][y[i]] -= 1 / n
+        grad_z = softmax(z, axis=1) / n + grad_a
+
+        return grad_a, grad_z
+
     def add_conv2d(self, name, size):
         self.add('cw' + name, size[1], size)
         self.add('cb' + name, size[1], size[0])
@@ -115,12 +125,7 @@ class MyFC(MyNN):
         return self.a2
 
     def backward(self, y):
-        n = y.shape[0]
-
-        self.grad_a2 = np.zeros(self.a2.shape)
-        for i in range(n):
-            self.grad_a2[i][y[i]] -= 1 / n
-        self.grad_z2 = softmax(self.z2, axis=1) / n + self.grad_a2
+        self.grad_a2, self.grad_z2 = self.bw_nll_loss(self.z2, y)
 
         self.bw_linear(2, self.a1, self.grad_z2)
 
