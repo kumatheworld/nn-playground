@@ -38,17 +38,17 @@ class MyNN():
         y = x.dot(w) + b
         return y
 
-    def bw_linear(self, i, x, grad_y):
-        self.params[f'b{i}'].grad = grad_y.sum(axis=0)
-        self.params[f'w{i}'].grad = np.transpose(x).dot(grad_y)
-        grad_x = grad_y.dot(np.transpose(self.params[f'w{i}'].val))
-        return grad_x
+    def bw_linear(self, i, x, dy):
+        self.params[f'b{i}'].grad = dy.sum(axis=0)
+        self.params[f'w{i}'].grad = np.transpose(x).dot(dy)
+        dx = dy.dot(np.transpose(self.params[f'w{i}'].val))
+        return dx
 
     def fw_relu(self, x):
         return np.maximum(x, 0)
 
-    def bw_relu(self, x, grad_y):
-        return (x > 0) * grad_y
+    def bw_relu(self, x, dy):
+        return (x > 0) * dy
 
     def fw_logsoftmax(self, x):
         return x - logsumexp(x, axis=1).reshape(-1, 1)
@@ -56,12 +56,12 @@ class MyNN():
     def bw_nll_loss(self, z, y):
         n = y.shape[0]
 
-        grad_a = np.zeros((n, self.size_out))
+        da = np.zeros((n, self.size_out))
         for i in range(n):
-            grad_a[i][y[i]] -= 1 / n
-        grad_z = softmax(z, axis=1) / n + grad_a
+            da[i][y[i]] -= 1 / n
+        dz = softmax(z, axis=1) / n + da
 
-        return grad_a, grad_z
+        return da, dz
 
     def add_conv2d(self, ch_out, ch_in, kw, kh):
         self.conv_count += 1
@@ -140,10 +140,10 @@ class MyFC(MyNN):
         return self.a2
 
     def backward(self, y):
-        grad_a2, grad_z2 = self.bw_nll_loss(self.z2, y)
-        grad_a1 = self.bw_linear(2, self.a1, grad_z2)
-        grad_z1 = self.bw_relu(self.z1, grad_a1)
-        grad_x = self.bw_linear(1, self.x, grad_z1)
+        da2, dz2 = self.bw_nll_loss(self.z2, y)
+        da1 = self.bw_linear(2, self.a1, dz2)
+        dz1 = self.bw_relu(self.z1, da1)
+        dx = self.bw_linear(1, self.x, dz1)
 
 
 
