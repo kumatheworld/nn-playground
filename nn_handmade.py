@@ -39,7 +39,8 @@ class MyNN():
     def bw_linear(self, i, x, grad_y):
         self.params[f'b{i}'].grad = grad_y.sum(axis=0)
         self.params[f'w{i}'].grad = np.transpose(x).dot(grad_y)
-        pass
+        grad_x = grad_y.dot(np.transpose(self.params[f'w{i}'].val))
+        return grad_x
 
     def bw_nll_loss(self, z, y):
         n = y.shape[0]
@@ -126,15 +127,13 @@ class MyFC(MyNN):
 
     def backward(self, y):
         self.grad_a2, self.grad_z2 = self.bw_nll_loss(self.z2, y)
-
-        self.bw_linear(2, self.a1, self.grad_z2)
-
-        self.grad_a1 = self.grad_z2.dot(np.transpose(self.params['w2'].val))
+        self.grad_a1 = self.bw_linear(2, self.a1, self.grad_z2)
         self.grad_z1 = (self.a1 > 0) * self.grad_a1
+        self.grad_x = self.bw_linear(1, self.x, self.grad_z1)
 
-        self.bw_linear(1, self.x, self.grad_z1)
 
-        self.grad_x = self.grad_z1.dot(np.transpose(self.params['w1'].val))
+
+
 
 
 def main():
