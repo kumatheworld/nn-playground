@@ -17,6 +17,7 @@ class MyNN():
         self.size_in = self.size_in_side * self.size_in_side
         self.size_out = 10
         self.params = {}
+        self.linear_count = 0
 
     def xavier_init(self, size_in, size):
         bd = 1 / math.sqrt(self.size_in)
@@ -25,12 +26,20 @@ class MyNN():
     def add(self, name, size_in, size):
         self.params[name] = MyTensor(self.xavier_init(size_in, size))
 
-    def add_linear(self, name, size):
-        self.add('w' + name, size[0], size)
-        self.add('b' + name, size[0], size[1])
+    def add_linear(self, size_in, size_out):
+        self.linear_count += 1
+        self.add(f'w{self.linear_count}', size_in, (size_in, size_out))
+        self.add(f'b{self.linear_count}', size_in, size_out)
 
-    def fw_linear(self, x, w, b):
-        return x.dot(w) + b
+    def fw_linear(self, i, x):
+        y = x.dot(self.params[f'w{i}'].val)
+        y += self.params[f'b{i}'].val
+        return y
+
+    def bw_linear(self, i, x, grad_y):
+        self.params[f'b{i}'].grad = grad_y.sum(axis=0)
+        self.params[f'w{i}'].grad = np.transpose(x).dot(grad_y)
+        pass
 
     def add_conv2d(self, name, size):
         self.add('cw' + name, size[1], size)
@@ -94,14 +103,14 @@ class MyFC(MyNN):
         super().__init__()
 
         size_hidden = 100
-        self.add_linear('1', (self.size_in, size_hidden))
-        self.add_linear('2', (size_hidden, self.size_out))
+        self.add_linear(self.size_in, size_hidden)
+        self.add_linear(size_hidden, self.size_out)
 
     def forward(self, x):
         self.x = x.reshape(-1, self.size_in)
-        self.z1 = self.fw_linear(self.x, self.params['w1'].val, self.params['b1'].val)
+        self.z1 = self.fw_linear(1, self.x)
         self.a1 = np.maximum(self.z1, 0)
-        self.z2 = self.fw_linear(self.a1, self.params['w2'].val, self.params['b2'].val)
+        self.z2 = self.fw_linear(2, self.a1)
         self.a2 = self.z2 - logsumexp(self.z2, axis=1).reshape(-1, 1)
         return self.a2
 
@@ -113,14 +122,12 @@ class MyFC(MyNN):
             self.grad_a2[i][y[i]] -= 1 / n
         self.grad_z2 = softmax(self.z2, axis=1) / n + self.grad_a2
 
-        self.params['b2'].grad = self.grad_z2.sum(axis=0)
-        self.params['w2'].grad = np.transpose(self.a1).dot(self.grad_z2)
+        self.bw_linear(2, self.a1, self.grad_z2)
 
         self.grad_a1 = self.grad_z2.dot(np.transpose(self.params['w2'].val))
         self.grad_z1 = (self.a1 > 0) * self.grad_a1
 
-        self.params['b1'].grad = self.grad_z1.sum(axis=0)
-        self.params['w1'].grad = np.transpose(self.x).dot(self.grad_z1)
+        self.bw_linear(1, self.x, self.grad_z1)
 
         self.grad_x = self.grad_z1.dot(np.transpose(self.params['w1'].val))
 
