@@ -18,6 +18,7 @@ class MyNN():
         self.size_out = 10
         self.params = {}
         self.linear_count = 0
+        self.conv_count = 0
 
     def xavier_init(self, size_in, size):
         bd = 1 / math.sqrt(self.size_in)
@@ -53,11 +54,14 @@ class MyNN():
 
         return grad_a, grad_z
 
-    def add_conv2d(self, name, size):
-        self.add('cw' + name, size[1], size)
-        self.add('cb' + name, size[1], size[0])
+    def add_conv2d(self, ch_out, ch_in, kw, kh):
+        self.conv_count += 1
+        self.add(f'cw{self.conv_count}', ch_in, (ch_out, ch_in, kw, kh))
+        self.add(f'cb{self.conv_count}', ch_in, ch_out)
 
-    def fw_conv2d(self, x, w, b):
+    def fw_conv2d(self, i, x):
+        w = self.params[f'cw{i}'].val
+        b = self.params[f'cb{i}'].val
         sheet = [correlate(x, np.expand_dims(w[i], axis=0), 'valid') for i in range(w.shape[0])]
         y = np.concatenate(sheet, axis=1)
         b_rep = np.expand_dims(np.expand_dims(np.tile(b, (y.shape[0], 1)), -1), -1)
