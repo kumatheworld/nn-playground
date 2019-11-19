@@ -50,6 +50,9 @@ class MyNN():
     def bw_relu(self, x, grad_y):
         return (x > 0) * grad_y
 
+    def fw_logsoftmax(self, x):
+        return x - logsumexp(x, axis=1).reshape(-1, 1)
+
     def bw_nll_loss(self, z, y):
         n = y.shape[0]
 
@@ -133,7 +136,7 @@ class MyFC(MyNN):
         self.z1 = self.fw_linear(1, self.x)
         self.a1 = self.fw_relu(self.z1)
         self.z2 = self.fw_linear(2, self.a1)
-        self.a2 = self.z2 - logsumexp(self.z2, axis=1).reshape(-1, 1)
+        self.a2 = self.fw_logsoftmax(self.z2)
         return self.a2
 
     def backward(self, y):
