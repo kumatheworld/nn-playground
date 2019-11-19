@@ -146,7 +146,20 @@ class MyFC(MyNN):
         dx = self.bw_linear(1, self.x, dz1)
 
 
+class MyCNN(MyNN):
+    def __init__(self):
+        super().__init__()
 
+        k = 5
+        ch1 = 20
+        ch2 = 50
+        self.add_conv2d(ch1, 1, k, k)
+        self.add_conv2d(ch2, ch1, k, k)
+
+        size_hidden = 500
+        self.size_fc_in = 800
+        self.add_linear(self.size_fc_in, size_hidden)
+        self.add_linear(size_hidden, self.size_out)
 
 
 
