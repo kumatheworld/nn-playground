@@ -140,10 +140,10 @@ class MyFC(MyNN):
         return self.a2
 
     def backward(self, y):
-        self.grad_a2, self.grad_z2 = self.bw_nll_loss(self.z2, y)
-        self.grad_a1 = self.bw_linear(2, self.a1, self.grad_z2)
-        self.grad_z1 = self.bw_relu(self.z1, self.grad_a1)
-        self.grad_x = self.bw_linear(1, self.x, self.grad_z1)
+        grad_a2, grad_z2 = self.bw_nll_loss(self.z2, y)
+        grad_a1 = self.bw_linear(2, self.a1, grad_z2)
+        grad_z1 = self.bw_relu(self.z1, grad_a1)
+        grad_x = self.bw_linear(1, self.x, grad_z1)
 
 
 
