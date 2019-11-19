@@ -44,6 +44,12 @@ class MyNN():
         grad_x = grad_y.dot(np.transpose(self.params[f'w{i}'].val))
         return grad_x
 
+    def fw_relu(self, x):
+        return np.maximum(x, 0)
+
+    def bw_relu(self, x, grad_y):
+        return (x > 0) * grad_y
+
     def bw_nll_loss(self, z, y):
         n = y.shape[0]
 
@@ -125,7 +131,7 @@ class MyFC(MyNN):
     def forward(self, x):
         self.x = x.reshape(-1, self.size_in)
         self.z1 = self.fw_linear(1, self.x)
-        self.a1 = np.maximum(self.z1, 0)
+        self.a1 = self.fw_relu(self.z1)
         self.z2 = self.fw_linear(2, self.a1)
         self.a2 = self.z2 - logsumexp(self.z2, axis=1).reshape(-1, 1)
         return self.a2
@@ -133,7 +139,7 @@ class MyFC(MyNN):
     def backward(self, y):
         self.grad_a2, self.grad_z2 = self.bw_nll_loss(self.z2, y)
         self.grad_a1 = self.bw_linear(2, self.a1, self.grad_z2)
-        self.grad_z1 = (self.a1 > 0) * self.grad_a1
+        self.grad_z1 = self.bw_relu(self.z1, self.grad_a1)
         self.grad_x = self.bw_linear(1, self.x, self.grad_z1)
 
 
