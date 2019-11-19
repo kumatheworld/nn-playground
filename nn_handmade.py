@@ -161,6 +161,23 @@ class MyCNN(MyNN):
         self.add_linear(self.size_fc_in, size_hidden)
         self.add_linear(size_hidden, self.size_out)
 
+    def forward(self, x):
+        self.x = x.reshape(-1, 1, self.size_in_side, self.size_in_side)
+        self.z1 = self.fw_conv2d(1, self.x)
+        self.a1 = self.fw_relu(self.z1)
+        self.m1 = self.fw_maxpool2d(self.a1, (2, 2))
+        self.z2 = self.fw_conv2d(2, self.m1)
+        self.a2 = self.fw_relu(self.z2)
+        self.m2 = self.fw_maxpool2d(self.a2, (2, 2))
+
+        self.f = self.m2.reshape(-1, self.size_fc_in)
+        self.z3 = self.fw_linear(1, self.f)
+        self.a3 = self.fw_relu(self.z3)
+        self.z4 = self.fw_linear(2, self.a3)
+        self.a4 = self.fw_logsoftmax(self.z4)
+
+        return self.a4
+
 
 
 def main():
