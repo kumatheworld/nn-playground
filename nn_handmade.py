@@ -32,8 +32,9 @@ class MyNN():
         self.add(f'b{self.linear_count}', size_in, size_out)
 
     def fw_linear(self, i, x):
-        y = x.dot(self.params[f'w{i}'].val)
-        y += self.params[f'b{i}'].val
+        w = self.params[f'w{i}'].val
+        b = self.params[f'b{i}'].val
+        y = x.dot(w) + b
         return y
 
     def bw_linear(self, i, x, grad_y):
