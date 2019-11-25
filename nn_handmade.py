@@ -88,6 +88,31 @@ class MyNN():
         y = np.stack(y, axis=3)
         return y
 
+    def bw_maxpool2d(self, x, dy):
+        n, c, h, w = dy.shape
+        size_out = h * w
+        kh = x.shape[2] // h
+        kw = x.shape[3] // w
+
+        index = np.unravel_index(
+            x.reshape(n, c, h, kh, w, kw)\
+             .transpose([0, 1, 2, 4, 3, 5])\
+             .reshape(n, c, -1, kh * kw)\
+             .argmax(axis=-1),
+            (kh, kw)
+        )
+        offset = np.unravel_index(np.arange(size_out), (h, w))
+        i, j = index[0] + offset[0]*kh, index[1] + offset[1]*kw
+
+        u, v = np.unravel_index(np.arange(n * c), (n, c))
+        u = np.repeat(u, size_out)
+        v = np.repeat(v, size_out)
+
+        dx = np.zeros(x.shape)
+        dx[u, v, i.flatten(), j.flatten()] = dy.flatten()
+
+        return dx
+
     def forward(self, x):
         pass
 
