@@ -35,13 +35,13 @@ class MyNN():
     def fw_linear(self, i, x):
         w = self.params[f'w{i}'].val
         b = self.params[f'b{i}'].val
-        y = x.dot(w) + b
+        y = x @ w + b
         return y
 
     def bw_linear(self, i, x, dy):
         self.params[f'b{i}'].grad = dy.sum(axis=0)
-        self.params[f'w{i}'].grad = np.transpose(x).dot(dy)
-        dx = dy.dot(np.transpose(self.params[f'w{i}'].val))
+        self.params[f'w{i}'].grad = x.T @ dy
+        dx = dy @ self.params[f'w{i}'].val.T
         return dx
 
     def fw_relu(self, x):
