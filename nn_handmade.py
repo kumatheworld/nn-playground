@@ -50,19 +50,6 @@ class MyNN():
     def bw_relu(self, x, dy):
         return (x > 0) * dy
 
-    def fw_logsoftmax(self, x):
-        return x - logsumexp(x, axis=1).reshape(-1, 1)
-
-    def bw_nll_loss(self, z, y):
-        n = y.shape[0]
-
-        da = np.zeros((n, self.size_out))
-        for i in range(n):
-            da[i][y[i]] -= 1 / n
-        dz = softmax(z, axis=1) / n + da
-
-        return da, dz
-
     def add_conv2d(self, ch_out, ch_in, kw, kh):
         self.conv_count += 1
         self.add(f'cw{self.conv_count}', ch_in, (ch_out, ch_in, kw, kh))
@@ -113,19 +100,32 @@ class MyNN():
 
         return dx
 
+    def fw_logsoftmax(self, x):
+        return x - logsumexp(x, axis=1).reshape(-1, 1)
+
+    def bw_logsoftmax(self, x, dy):
+        return dy - softmax(x, axis=1) * dy.sum(axis=1).reshape(-1, 1)
+
+    def fw_nll_loss(self, x, y):
+        n = y.shape[0]
+        l = -x[np.arange(n), y].sum() / n
+        return l
+
+    def bw_nll_loss(self, x, y):
+        n = y.shape[0]
+        dx = np.zeros(x.shape)
+        dx[np.arange(n), y] = -1 / n
+        return dx
+
     def forward(self, x):
         pass
 
-    def loss(self, out, y):
-        n = y.shape[0]
-        l = 0
-        for i in range(n):
-            l -= out[i][y[i]]
-        l = l / n
-        return l
-
     def backward(self, y):
         pass
+
+    def loss(self, x, y):
+        out = self.forward(x)
+        return self.fw_nll_loss(out, y)
 
     def init_velocity(self):
         for par in self.params.values():
@@ -138,14 +138,12 @@ class MyNN():
 
     def train(self, x, y, lr, rho):
         self.init_velocity()
-        out = self.forward(x)
-        self.loss_train = self.loss(out, y)
+        self.loss_train = self.loss(x, y)
         self.backward(y)
         self.update(lr, rho)
 
     def test(self, x, y):
-        out = self.forward(x)
-        self.loss_test = self.loss(out, y)
+        self.loss_test = self.loss(x, y)
 
 
 class MyFC(MyNN):
@@ -165,7 +163,8 @@ class MyFC(MyNN):
         return self.a2
 
     def backward(self, y):
-        da2, dz2 = self.bw_nll_loss(self.z2, y)
+        da2 = self.bw_nll_loss(self.a2, y)
+        dz2 = self.bw_logsoftmax(self.z2, da2)
         da1 = self.bw_linear(2, self.a1, dz2)
         dz1 = self.bw_relu(self.z1, da1)
         dx = self.bw_linear(1, self.x, dz1)
