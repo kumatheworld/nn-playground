@@ -96,7 +96,7 @@ class MyNN():
         v = np.repeat(v, size_out)
 
         dx = np.zeros(x.shape)
-        dx[u, v, i.flatten(), j.flatten()] = dy.flatten()
+        dx[u, v, i.ravel(), j.ravel()] = dy.ravel()
 
         return dx
 
