@@ -69,10 +69,10 @@ class MyNN():
         kw = k[1]
         h_out = x.shape[2] // kh
         w_out = x.shape[3] // kw
-        y = [np.max(x[:, :, i*kh:(i+1)*kh, :], axis=2) for i in range(h_out)]
-        y = np.stack(y, axis=2)
-        y = [np.max(y[:, :, :, j*kw:(j+1)*kw], axis=3) for j in range(w_out)]
-        y = np.stack(y, axis=3)
+        y = np.stack([
+            np.max(x[:, :, i*kh:(i+1)*kh, j*kw:(j+1)*kw], axis=(2, 3))
+            for i in range(h_out) for j in range(w_out)
+        ], axis=-1).reshape(x.shape[0], x.shape[1], h_out, w_out)
         return y
 
     def bw_maxpool2d(self, x, dy):
