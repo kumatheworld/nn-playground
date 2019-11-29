@@ -67,36 +67,33 @@ class MyNN():
     def fw_maxpool2d(self, x, k):
         kh = k[0]
         kw = k[1]
-        h_out = x.shape[2] // kh
-        w_out = x.shape[3] // kw
+        hy = x.shape[2] // kh
+        wy = x.shape[3] // kw
         y = np.stack([
             np.max(x[:, :, i*kh:(i+1)*kh, j*kw:(j+1)*kw], axis=(2, 3))
-            for i in range(h_out) for j in range(w_out)
-        ], axis=-1).reshape(x.shape[0], x.shape[1], h_out, w_out)
+            for i in range(hy) for j in range(wy)
+        ], axis=-1).reshape(x.shape[0], x.shape[1], hy, wy)
         return y
 
     def bw_maxpool2d(self, x, dy):
-        n, c, h, w = dy.shape
-        size_out = h * w
-        kh = x.shape[2] // h
-        kw = x.shape[3] // w
+        n, c, hy, wy = dy.shape
+        size_y = hy * wy
+        kh = x.shape[2] // hy
+        kw = x.shape[3] // wy
 
         index = np.unravel_index(
-            x.reshape(n, c, h, kh, w, kw)\
+            x.reshape(n, c, hy, kh, wy, kw)\
              .transpose([0, 1, 2, 4, 3, 5])\
              .reshape(n, c, -1, kh * kw)\
              .argmax(axis=-1),
             (kh, kw)
         )
-        offset = np.unravel_index(np.arange(size_out), (h, w))
+        offset = np.unravel_index(np.arange(size_y), (hy, wy))
         i, j = index[0] + offset[0]*kh, index[1] + offset[1]*kw
 
         u, v = np.unravel_index(np.arange(n * c), (n, c))
-        u = np.repeat(u, size_out)
-        v = np.repeat(v, size_out)
-
         dx = np.zeros(x.shape)
-        dx[u, v, i.ravel(), j.ravel()] = dy.ravel()
+        dx[u.repeat(size_y), v.repeat(size_y), i.ravel(), j.ravel()] = dy.ravel()
 
         return dx
 
