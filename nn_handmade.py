@@ -121,8 +121,8 @@ class MyNN():
         pass
 
     def loss(self, x, y):
-        out = self.forward(x)
-        return self.fw_nll_loss(out, y)
+        self.out = self.forward(x)
+        return self.fw_nll_loss(self.out, y)
 
     def init_velocity(self):
         for par in self.params.values():
@@ -241,7 +241,7 @@ def main():
             x = x.numpy()
             y = y.numpy()
             net.test(x, y)
-            pred = net.a2.argmax(axis=1)
+            pred = net.out.argmax(axis=1)
             test_loss += net.loss_test * batch_size
             correct += sum(pred == y)
 
