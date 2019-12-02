@@ -222,6 +222,20 @@ class MyCNN(MyNN):
 
         return self.a4
 
+    def backward(self, y):
+        da4 = self.bw_nll_loss(self.a4, y)
+        dz4 = self.bw_logsoftmax(self.z4, da4)
+        da3 = self.bw_linear(2, self.a3, dz4)
+        dz3 = self.bw_relu(self.z3, da3)
+        df = self.bw_linear(1, self.f, dz3)
+
+        dm2 = df.reshape(-1, 50, 4, 4)
+        da2 = self.bw_maxpool2d(self.a2, dm2)
+        dz2 = self.bw_relu(self.z2, da2)
+        dm1 = self.bw_conv2d(2, self.m1, dz2)
+        da1 = self.bw_maxpool2d(self.a1, dm1)
+        dz1 = self.bw_relu(self.z1, da1)
+        dx = self.bw_conv2d(1, self.x, dz1)
 
 
 def main():
