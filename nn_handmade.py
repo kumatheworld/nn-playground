@@ -66,6 +66,27 @@ class MyNN():
         y += b_rep
         return y
 
+    def bw_conv2d(self, i, x, dy):
+        self.params[f'cb{i}'].grad = dy.sum(axis=(0, 2, 3))
+
+        w = self.params[f'cw{i}'].val
+        cout, cin, kh, kw = w.shape
+
+        self.params[f'cw{i}'].grad = np.concatenate([
+            correlate(x[:, i], dy[:, j], 'valid')
+            for i in range(cin) for j in range(cout)
+        ]).reshape(w.shape)
+
+        dx = np.concatenate([
+            correlate(
+                np.pad(dy[i], ((0,0), (kh-1,kh-1), (kw-1,kw-1))),
+                np.flip(w[:, j], (1,2)),
+                'valid'
+            ) for i in range(dy.shape[0]) for j in range(cin)
+        ]).reshape(x.shape)
+
+        return dx
+
     def fw_maxpool2d(self, x, k):
         kh = k[0]
         kw = k[1]
