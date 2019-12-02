@@ -10,3 +10,7 @@
   * A handmade FC network with NumPy
     * Achieved 95% accuracy with a simple SGD
       * Momentum alone didn't really help
+  * A handmade CNN with NumPy
+    * Achieved 98% accuracy with a simple SGD
+    * Took 22 hours for just 10 epochs!
+    * Loss decreased very slowly (why?)
