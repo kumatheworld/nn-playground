@@ -19,6 +19,7 @@ class MyNN():
         self.params = {}
         self.linear_count = 0
         self.conv_count = 0
+        np.random.seed(0)
 
     def xavier_init(self, size_in, size):
         bd = 1 / math.sqrt(self.size_in)
@@ -246,6 +247,7 @@ def main():
     epochs = 10
     log_interval = 10
 
+    torch.manual_seed(0)
     train_loader = torch.utils.data.DataLoader(
     datasets.MNIST('data', train=True, download=True,
                    transform=transforms.Compose([
