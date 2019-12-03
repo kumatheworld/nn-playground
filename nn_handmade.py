@@ -4,6 +4,7 @@ from scipy.special import logsumexp, softmax
 from scipy.signal import correlate
 from torchvision import datasets, transforms
 import torch
+import functions
 
 class MyTensor():
     def __init__(self, val):
@@ -240,7 +241,7 @@ class MyCNN(MyNN):
 
 
 def main():
-    net = MyFC()
+    net = MyCNN()
     batch_size = 128
     lr = 1e-2
     rho = 0.9
@@ -262,9 +263,12 @@ def main():
                    ])),
     batch_size=batch_size, shuffle=True)
 
+    iter = 0
+    plotter = functions.VisdomLinePlotter()
     for epoch in range(1, epochs + 1):
         # train
         for batch_idx, (x, y) in enumerate(train_loader):
+            iter += 1
             x = x.numpy()
             y = y.numpy()
             net.train(x, y, lr, rho)
@@ -272,6 +276,7 @@ def main():
                 print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
                     epoch, batch_idx * len(x), len(train_loader.dataset),
                     100. * batch_idx / len(train_loader), net.loss_train))
+            plotter.plot('CNN', 'Right CNN', 'Training Loss', iter, net.loss_train)
 
         # test
         test_loss = 0
