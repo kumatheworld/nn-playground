@@ -13,6 +13,7 @@
   * A handmade CNN with NumPy
     * Achieved 98% accuracy with a simple SGD
     * Took 22 hours for just 10 epochs!
-    * Loss decreased very slowly (why?)
+    * The loss didn't decrease during the 1st epoch
+      * Was the initialization bad?
     * Also tried misimplementing bw_conv2d(), which actually worked for some reason...
       ![](img/cnn_loss_plot.png)
