@@ -54,8 +54,9 @@ class MyNN():
 
     def add_conv2d(self, ch_out, ch_in, kw, kh):
         self.conv_count += 1
-        self.add(f'cw{self.conv_count}', ch_in, (ch_out, ch_in, kw, kh))
-        self.add(f'cb{self.conv_count}', ch_in, ch_out)
+        size_in = ch_in * kw * kh
+        self.add(f'cw{self.conv_count}', size_in, (ch_out, ch_in, kw, kh))
+        self.add(f'cb{self.conv_count}', size_in, ch_out)
 
     def fw_conv2d(self, i, x):
         w = self.params[f'cw{i}'].val
