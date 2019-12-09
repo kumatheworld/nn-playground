@@ -9,6 +9,20 @@ size_in = 28 * 28
 size_out = 10
 
 
+class Linear(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.layers = nn.Sequential(
+            nn.Linear(size_in, size_out),
+            nn.LogSoftmax(dim=1)
+        )
+
+    def forward(self, x):
+        x = x.view(-1, size_in)
+        x = self.layers(x)
+        return x
+
+
 class FC(nn.Module):
     def __init__(self):
         super().__init__()
@@ -30,7 +44,7 @@ class FCSeq(nn.Module):
             nn.Linear(size_in, self.size_hidden),
             nn.ReLU(inplace=True),
             nn.Linear(self.size_hidden, size_out),
-            nn.LogSoftmax()
+            nn.LogSoftmax(dim=1)
         )
 
     def forward(self, x):
@@ -72,7 +86,7 @@ class CNNSeq(nn.Module):
             nn.Linear(4*4*50, 500),
             nn.ReLU(inplace=True),
             nn.Linear(500, 10),
-            nn.LogSoftmax()
+            nn.LogSoftmax(dim=1)
         )
 
     def forward(self, x):
@@ -172,4 +186,4 @@ def main(net):
 
 
 if __name__ == '__main__':
-    main(FC)
+    main(Linear)
