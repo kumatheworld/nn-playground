@@ -3,6 +3,8 @@
 
 ## What's done
 * MNIST
+  * A linear network with PyTorch
+    * Achieved 92% accuracy
   * A fully connected network with PyTorch
     * Achieved 97% accuracy
   * A convolutional neural network with PyTorch
