@@ -22,12 +22,12 @@ class MyNN():
         self.conv_count = 0
         np.random.seed(0)
 
-    def xavier_init(self, size_in, size):
+    def init_param(self, size_in, size):
         bd = 1 / math.sqrt(self.size_in)
         return np.random.uniform(-bd, bd, size)
 
     def add(self, name, size_in, size):
-        self.params[name] = MyTensor(self.xavier_init(size_in, size))
+        self.params[name] = MyTensor(self.init_param(size_in, size))
 
     def add_linear(self, size_in, size_out):
         self.linear_count += 1
