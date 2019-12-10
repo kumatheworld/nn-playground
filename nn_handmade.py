@@ -23,7 +23,7 @@ class MyNN():
         np.random.seed(0)
 
     def init_param(self, size_in, size):
-        bd = 1 / math.sqrt(self.size_in)
+        bd = math.sqrt(3 / self.size_in)
         return np.random.uniform(-bd, bd, size)
 
     def add(self, name, size_in, size):
