@@ -36,22 +36,6 @@ class FC(nn.Module):
         x = self.fc2(x)
         return F.log_softmax(x, dim=1)
 
-class FCSeq(nn.Module):
-    def __init__(self):
-        super().__init__()
-        self.size_hidden = 100
-        self.layers = nn.Sequential(
-            nn.Linear(size_in, self.size_hidden),
-            nn.ReLU(inplace=True),
-            nn.Linear(self.size_hidden, size_out),
-            nn.LogSoftmax(dim=1)
-        )
-
-    def forward(self, x):
-        x = x.view(-1, size_in)
-        x = self.layers(x)
-        return x
-
 
 class CNN(nn.Module):
     def __init__(self):
@@ -70,30 +54,6 @@ class CNN(nn.Module):
         x = F.relu(self.fc1(x))
         x = self.fc2(x)
         return F.log_softmax(x, dim=1)
-
-class CNNSeq(nn.Module):
-    def __init__(self):
-        super(CNNSeq, self).__init__()
-        self.features = nn.Sequential(
-            nn.Conv2d(1, 20, 5, 1),
-            nn.ReLU(inplace=True),
-            nn.MaxPool2d(2, 2),
-            nn.Conv2d(20, 50, 5, 1),
-            nn.ReLU(inplace=True),
-            nn.MaxPool2d(2, 2)
-        )
-        self.layers = nn.Sequential(
-            nn.Linear(4*4*50, 500),
-            nn.ReLU(inplace=True),
-            nn.Linear(500, 10),
-            nn.LogSoftmax(dim=1)
-        )
-
-    def forward(self, x):
-        x = self.features(x)
-        x = x.view(-1, 4*4*50)
-        x = self.layers(x)
-        return x
 
 
 class CNNDeep(nn.Module):
