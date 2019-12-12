@@ -50,7 +50,7 @@ class CNN(nn.Module):
         x = F.max_pool2d(x, 2, 2)
         x = F.relu(self.conv2(x))
         x = F.max_pool2d(x, 2, 2)
-        x = x.view(-1, 4*4*50)
+        x = x.view(x.size(0), -1)
         x = F.relu(self.fc1(x))
         x = self.fc2(x)
         return F.log_softmax(x, dim=1)
@@ -97,6 +97,7 @@ class CNNDeep(nn.Module):
             nn.ReLU(inplace=True),
         )
         self.layers = nn.Sequential(
+            nn.Flatten(),
             nn.Linear(6*6*ch, hidden),
             nn.BatchNorm1d(hidden),
             nn.ReLU(inplace=True),
@@ -106,7 +107,6 @@ class CNNDeep(nn.Module):
 
     def forward(self, x):
         x = self.features(x)
-        x = x.view(x.size(0), -1)
         x = self.layers(x)
         return x
 
