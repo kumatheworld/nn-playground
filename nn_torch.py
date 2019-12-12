@@ -96,6 +96,61 @@ class CNNSeq(nn.Module):
         return x
 
 
+class CNNDeep(nn.Module):
+    def __init__(self):
+        super(CNNDeep, self).__init__()
+        ch = 64
+        hidden = 128
+        self.features = nn.Sequential(
+            nn.Conv2d(1, ch, 3),
+            nn.BatchNorm2d(ch),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(ch, ch, 3),
+            nn.BatchNorm2d(ch),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(ch, ch, 3),
+            nn.BatchNorm2d(ch),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(ch, ch, 3),
+            nn.BatchNorm2d(ch),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(ch, ch, 3),
+            nn.BatchNorm2d(ch),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(ch, ch, 3),
+            nn.BatchNorm2d(ch),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(ch, ch, 3),
+            nn.BatchNorm2d(ch),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(ch, ch, 3),
+            nn.BatchNorm2d(ch),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(ch, ch, 3),
+            nn.BatchNorm2d(ch),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(ch, ch, 3),
+            nn.BatchNorm2d(ch),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(ch, ch, 3),
+            nn.BatchNorm2d(ch),
+            nn.ReLU(inplace=True),
+        )
+        self.layers = nn.Sequential(
+            nn.Linear(6*6*ch, hidden),
+            nn.BatchNorm1d(hidden),
+            nn.ReLU(inplace=True),
+            nn.Linear(hidden, 10),
+            nn.LogSoftmax(dim=1)
+        )
+
+    def forward(self, x):
+        x = self.features(x)
+        x = x.view(x.size(0), -1)
+        x = self.layers(x)
+        return x
+
+
 def train(args, model, device, train_loader, optimizer, epoch):
     model.train()
     for batch_idx, (data, target) in enumerate(train_loader):
@@ -137,7 +192,7 @@ def main(net):
                         help='input batch size for training (default: 128)')
     parser.add_argument('--test-batch-size', type=int, default=1000, metavar='N',
                         help='input batch size for testing (default: 1000)')
-    parser.add_argument('--epochs', type=int, default=10, metavar='N',
+    parser.add_argument('--epochs', type=int, default=10000, metavar='N',
                         help='number of epochs to train (default: 10)')
     parser.add_argument('--lr', type=float, default=0.01, metavar='LR',
                         help='learning rate (default: 0.01)')
