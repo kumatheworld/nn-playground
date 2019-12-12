@@ -10,6 +10,8 @@
       * Achieved 97% accuracy
     * A convolutional neural network
       * Achieved 99% accuracy
+    * A deep convolutional neural network
+      * Achieved 99.5% accuracy in 8 epochs
   * Implementing handmade neural networks using NumPy
     * A fully connected network
       * Achieved 95% accuracy with a simple SGD
