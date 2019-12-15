@@ -111,3 +111,6 @@ dmypy.json
 
 # datasets
 data/
+
+# ngrok for using Visdom on Google Colab
+ngrok
