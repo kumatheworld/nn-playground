@@ -2,9 +2,10 @@ import numpy as np
 import math
 from scipy.special import logsumexp, softmax
 from scipy.signal import correlate
-from torchvision import datasets, transforms
 import torch
-import functions
+from torchvision import datasets, transforms
+from functions import VisdomLinePlotter
+
 
 class MyTensor():
     def __init__(self, val):
@@ -265,7 +266,7 @@ def main():
     batch_size=batch_size, shuffle=True)
 
     iter = 0
-    plotter = functions.VisdomLinePlotter()
+    plotter = VisdomLinePlotter(title='Training Loss', xlabel='Iterations')
     for epoch in range(1, epochs + 1):
         # train
         for batch_idx, (x, y) in enumerate(train_loader):
@@ -277,7 +278,7 @@ def main():
                 print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
                     epoch, batch_idx * len(x), len(train_loader.dataset),
                     100. * batch_idx / len(train_loader), net.loss_train))
-            plotter.plot('CNN', 'Right CNN', 'Training Loss', iter, net.loss_train)
+            plotter.plot('nn_handmade', 'Right CNN', iter, net.loss_train)
 
         # test
         test_loss = 0
