@@ -4,6 +4,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 from torchvision import datasets, transforms
+from functions import VisdomLinePlotter
 
 size_in = 28 * 28
 size_out = 10
@@ -112,12 +113,14 @@ class CNNDeep(nn.Module):
 
 
 def train(args, model, device, train_loader, optimizer, epoch):
+    kinda_loss = 0
     model.train()
     for batch_idx, (data, target) in enumerate(train_loader):
         data, target = data.to(device), target.to(device)
         optimizer.zero_grad()
         output = model(data)
         loss = F.nll_loss(output, target)
+        kinda_loss += loss.item() * len(data)
         loss.backward()
         optimizer.step()
         if batch_idx % args.log_interval == 0:
@@ -125,8 +128,11 @@ def train(args, model, device, train_loader, optimizer, epoch):
                 epoch, batch_idx * len(data), len(train_loader.dataset),
                 100. * batch_idx / len(train_loader), loss.item()))
 
+    kinda_loss /= len(train_loader.dataset)
+    plotter.plot('nn_torch', 'Train', epoch, kinda_loss)
 
-def test(args, model, device, test_loader):
+
+def test(args, model, device, test_loader, epoch):
     model.eval()
     test_loss = 0
     correct = 0
@@ -143,6 +149,8 @@ def test(args, model, device, test_loader):
     print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
         test_loss, correct, len(test_loader.dataset),
         100. * correct / len(test_loader.dataset)))
+
+    plotter.plot('nn_torch', 'Test', epoch, test_loss)
 
 
 def main(net):
@@ -192,9 +200,11 @@ def main(net):
     model = net().to(device)
     optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
 
+    global plotter
+    plotter = VisdomLinePlotter()
     for epoch in range(1, args.epochs + 1):
         train(args, model, device, train_loader, optimizer, epoch)
-        test(args, model, device, test_loader)
+        test(args, model, device, test_loader, epoch)
 
     if args.save_model:
         torch.save(model.state_dict(), "model.pt")
