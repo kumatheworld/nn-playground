@@ -23,3 +23,9 @@
         * Was the initialization bad?
       * Also tried misimplementing bw_conv2d(), which actually worked for some reason...
         ![](img/cnn_loss_plot.png)
+
+## TODO
+  * Display misclassified images
+  * Try other datasets (CIFAR-10, Fashion MNIST, ...)
+  * Implement Batch Normalization
+  * Try knowledge distillation
