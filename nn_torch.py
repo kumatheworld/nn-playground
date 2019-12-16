@@ -22,7 +22,7 @@ class Linear(nn.Module):
         return x
 
 
-class FC(nn.Module):
+class WLP(nn.Module):
     dataset = 'MNIST'
 
     def __init__(self):
