@@ -27,5 +27,7 @@
 ## TODO
   * Display misclassified images
   * Try other datasets (CIFAR-10, Fashion MNIST, ...)
+  * Write a configuration file
+  * Make nn_handmade.py neater as well
   * Implement Batch Normalization
   * Try knowledge distillation
