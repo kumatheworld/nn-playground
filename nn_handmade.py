@@ -23,17 +23,19 @@ class MyNN():
         self.conv_count = 0
         np.random.seed(0)
 
-    def init_param(self, size_in, size):
+    def init_param(self, size_in, size, zero):
+        if zero:
+            return np.zeros(size)
         bd = math.sqrt(3 / self.size_in)
         return np.random.uniform(-bd, bd, size)
 
-    def add(self, name, size_in, size):
-        self.params[name] = MyTensor(self.init_param(size_in, size))
+    def add(self, name, size_in, size, zero=False):
+        self.params[name] = MyTensor(self.init_param(size_in, size, zero))
 
     def add_linear(self, size_in, size_out):
         self.linear_count += 1
         self.add(f'w{self.linear_count}', size_in, (size_in, size_out))
-        self.add(f'b{self.linear_count}', size_in, size_out)
+        self.add(f'b{self.linear_count}', size_in, size_out, zero=True)
 
     def fw_linear(self, i, x):
         w = self.params[f'w{i}'].val
@@ -57,7 +59,7 @@ class MyNN():
         self.conv_count += 1
         size_in = ch_in * kw * kh
         self.add(f'cw{self.conv_count}', size_in, (ch_out, ch_in, kw, kh))
-        self.add(f'cb{self.conv_count}', size_in, ch_out)
+        self.add(f'cb{self.conv_count}', size_in, ch_out, zero=True)
 
     def fw_conv2d(self, i, x):
         w = self.params[f'cw{i}'].val
