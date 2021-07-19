@@ -189,6 +189,7 @@ class MyFC(MyNN):
         da1 = self.bw_linear(2, self.a1, dz2)
         dz1 = self.bw_relu(self.z1, da1)
         dx = self.bw_linear(1, self.x, dz1)
+        return dx
 
 
 class MyCNN(MyNN):
@@ -237,6 +238,8 @@ class MyCNN(MyNN):
         da1 = self.bw_maxpool2d(self.a1, dm1)
         dz1 = self.bw_relu(self.z1, da1)
         dx = self.bw_conv2d(1, self.x, dz1)
+
+        return dx
 
 
 def main():
