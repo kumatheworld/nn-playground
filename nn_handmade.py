@@ -8,10 +8,10 @@ from functions import VisdomLinePlotter
 
 
 class MyTensor():
-    def __init__(self, val):
-        self.val = val
-        self.grad = np.zeros_like(val)
-        self.velocity = np.zeros_like(val)
+    def __init__(self, value):
+        self.value = value
+        self.gradient = np.zeros_like(value)
+        self.velocity = np.zeros_like(value)
 
 class MyNN():
     def __init__(self):
@@ -38,15 +38,15 @@ class MyNN():
         self.add(f'b{self.linear_count}', size_in, size_out, zero=True)
 
     def fw_linear(self, i, x):
-        w = self.params[f'w{i}'].val
-        b = self.params[f'b{i}'].val
+        w = self.params[f'w{i}'].value
+        b = self.params[f'b{i}'].value
         y = x @ w + b
         return y
 
     def bw_linear(self, i, x, dy):
-        self.params[f'b{i}'].grad = dy.sum(axis=0)
-        self.params[f'w{i}'].grad = x.T @ dy
-        dx = dy @ self.params[f'w{i}'].val.T
+        self.params[f'b{i}'].gradient = dy.sum(axis=0)
+        self.params[f'w{i}'].gradient = x.T @ dy
+        dx = dy @ self.params[f'w{i}'].value.T
         return dx
 
     def fw_relu(self, x):
@@ -62,8 +62,8 @@ class MyNN():
         self.add(f'cb{self.conv_count}', size_in, ch_out, zero=True)
 
     def fw_conv2d(self, i, x):
-        w = self.params[f'cw{i}'].val
-        b = self.params[f'cb{i}'].val
+        w = self.params[f'cw{i}'].value
+        b = self.params[f'cb{i}'].value
         y = np.concatenate([
             correlate(x, np.expand_dims(w[i], axis=0), 'valid')
             for i in range(w.shape[0])
@@ -73,12 +73,12 @@ class MyNN():
         return y
 
     def bw_conv2d(self, i, x, dy):
-        self.params[f'cb{i}'].grad = dy.sum(axis=(0, 2, 3))
+        self.params[f'cb{i}'].gradient = dy.sum(axis=(0, 2, 3))
 
-        w = self.params[f'cw{i}'].val
+        w = self.params[f'cw{i}'].value
         cout, cin, kh, kw = w.shape
 
-        self.params[f'cw{i}'].grad = np.concatenate([
+        self.params[f'cw{i}'].gradient = np.concatenate([
             correlate(x[:, i], dy[:, j], 'valid')
             for i in range(cin) for j in range(cout)
         ]).reshape(w.shape)
@@ -154,9 +154,9 @@ class MyNN():
         return self.fw_nll_loss(self.out, y)
 
     def update(self, lr, rho):
-        for par in self.params.values():
-            par.velocity = rho * par.velocity + par.grad
-            par.val -= lr * par.velocity
+        for param in self.params.values():
+            param.velocity = rho * param.velocity + param.gradient
+            param.value -= lr * param.velocity
 
     def train(self, x, y, lr, rho):
         self.loss_train = self.loss(x, y)
