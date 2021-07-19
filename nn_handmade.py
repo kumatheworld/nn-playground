@@ -1,5 +1,4 @@
 import numpy as np
-import math
 from scipy.special import logsumexp, softmax
 from scipy.signal import correlate
 import torch
@@ -26,7 +25,7 @@ class MyNN():
     def init_param(self, size_in, size, zero):
         if zero:
             return np.zeros(size)
-        bd = math.sqrt(3 / self.size_in)
+        bd = np.sqrt(3 / self.size_in)
         return np.random.uniform(-bd, bd, size)
 
     def add(self, name, size_in, size, zero=False):
