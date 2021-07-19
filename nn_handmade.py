@@ -10,8 +10,8 @@ from functions import VisdomLinePlotter
 class MyTensor():
     def __init__(self, val):
         self.val = val
-        self.grad = 0
-        self.velocity = 0
+        self.grad = np.zeros_like(val)
+        self.velocity = np.zeros_like(val)
 
 class MyNN():
     def __init__(self):
