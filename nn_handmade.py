@@ -12,6 +12,7 @@ class MyTensor():
         self.gradient = np.zeros_like(value)
         self.velocity = np.zeros_like(value)
 
+
 class MyNN():
     def __init__(self):
         self.size_in_side = 28
@@ -291,6 +292,7 @@ def main():
         print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
             test_loss, correct, len(test_loader.dataset),
             100. * correct / len(test_loader.dataset)))
+
 
 if __name__ == '__main__':
     main()
