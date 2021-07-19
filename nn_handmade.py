@@ -153,17 +153,12 @@ class MyNN():
         self.out = self.forward(x)
         return self.fw_nll_loss(self.out, y)
 
-    def init_velocity(self):
-        for par in self.params.values():
-            par.velocity = 0
-
     def update(self, lr, rho):
         for par in self.params.values():
             par.velocity = rho * par.velocity + par.grad
             par.val -= lr * par.velocity
 
     def train(self, x, y, lr, rho):
-        self.init_velocity()
         self.loss_train = self.loss(x, y)
         self.backward(y)
         self.update(lr, rho)
